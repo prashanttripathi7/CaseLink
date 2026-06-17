@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}{{ case.case_id }} | CaseLink{% endblock %}
+{% block content %}
+<section class="page-heading row-gap">
+  <div>
+    <p class="eyebrow">Investigation Detail</p>
+    <h1><i data-lucide="briefcase"></i> {{ case.case_id }}</h1>
+    <span class="status">{{ case.status }}</span>
+  </div>
+  <div class="actions">
+    <a class="btn btn-outline-light btn-sm" href="{{ url_for('main.case_report', case_id=case.id) }}"><i data-lucide="file-text"></i> PDF Report</a>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_edit', case_id=case.id) }}"><i data-lucide="edit"></i> Edit Investigation</a>
+  </div>
+</section>
+
+<section class="two-column">
+  <div class="panel">
+    <div class="panel-head"><h2><i data-lucide="info"></i> Investigation Metadata</h2></div>
+    <dl class="meta-list">
+      <dt>FIR Number</dt><dd>{{ case.fir_number }}</dd>
+      <dt>Complaint Date</dt><dd>{{ case.complaint_date.strftime("%d %b %Y") }}</dd>
+      <dt>Fraud Type</dt><dd>{{ case.fraud_type }}</dd>
+      <dt>Investigating Officer</dt><dd>{{ case.investigating_officer }}</dd>
+      <dt>Victim</dt><dd>{{ case.victim_name }} / {{ case.victim_contact }}</dd>
+    </dl>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><h2><i data-lucide="link-2"></i> Relationship Summary</h2></div>
+    {% if relationships.alerts %}
+      {% for alert in relationships.alerts %}<div class="finding"><i data-lucide="alert-circle"></i> {{ alert }}</div>{% endfor %}
+    {% else %}
+      <p class="empty"><i data-lucide="inbox"></i> No cross-investigation relationship detected.</p>
+    {% endif %}
+    {% for item in relationships.indirect %}
+      <div class="finding muted"><i data-lucide="arrow-right"></i> Indirect path: {{ item.path }}</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head"><h2><i data-lucide="database"></i> Associated Evidence</h2><span class="badge">{{ case.entities|length }} recorded</span></div>
+  {% if case.entities %}
+  <div class="entity-grid">
+    {% for entity in case.entities %}
+      <div class="entity-card">
+        <span style="text-transform: capitalize; font-weight: 600; color: #8cc2ff;">{{ entity.type_label }}</span>
+        <strong>{{ entity.value }}</strong>
+        <small><i data-lucide="link-2"></i> {{ entity.cases|length }} linked investigation{{ "s" if entity.cases|length != 1 }}</small>
+        {% if entity.cases|length > 1 %}
+          <em style="font-size: 11px;">Related: {% for related in entity.cases if related.id != case.id %}{{ related.case_id }} {% endfor %}</em>
+        {% endif %}
+        <div style="display: flex; gap: 6px; margin-top: 8px;">
+          <a href="{{ url_for('main.entity_edit', entity_id=entity.id) }}" class="btn btn-outline-light btn-xs"><i data-lucide="edit"></i></a>
+          <form method="post" action="{{ url_for('main.case_remove_entity', case_id=case.id, entity_id=entity.id) }}" style="flex: 1;">
+            {{ entity_form.csrf_token }}
+            <button class="btn btn-danger btn-xs" style="width: 100%;"><i data-lucide="trash-2"></i></button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <p><i data-lucide="inbox"></i> <strong>No digital evidence has been linked yet.</strong></p>
+    <p style="font-size: 12px;">Add evidence below to establish connections with other investigations.</p>
+  </div>
+  {% endif %}
+</section>
+
+<section class="two-column">
+  <form class="panel form-stack" method="post" action="{{ url_for('main.case_add_entity', case_id=case.id) }}">
+    <div class="panel-head"><h2><i data-lucide="plus"></i> Add Digital Evidence</h2><span style="font-size: 11px; color: #8b98a8;">Link to other cases</span></div>
+    <div style="background: rgba(47, 129, 247, 0.08); border: 1px solid #3a5a8a; border-radius: 6px; padding: 10px; margin-bottom: 12px; font-size: 12px; color: #b8c4d4;">
+      <i data-lucide="lightbulb"></i> <strong>Tip:</strong> Add phone numbers, names, addresses, license plates, bank accounts, or any identifier to find linked investigations.
+    </div>
+    {{ entity_form.hidden_tag() }}
+    <label style="font-size: 12px; color: #8b98a8; font-weight: 600; margin-bottom: 4px; display: block;">Evidence Type</label>
+    {{ entity_form.entity_type(class_="form-select form-select-sm") }}
+    <label style="font-size: 12px; color: #8b98a8; font-weight: 600; margin-bottom: 4px; display: block; margin-top: 10px;">Evidence Value</label>
+    {{ entity_form.value(class_="form-control form-control-sm", placeholder="e.g., +91-98765-43210, alex_smith, KA-01-AB-1234") }}
+    <label style="font-size: 12px; color: #8b98a8; font-weight: 600; margin-bottom: 4px; display: block; margin-top: 10px;">Label (Optional)</label>
+    {{ entity_form.label(class_="form-control form-control-sm", placeholder="e.g., Suspect's primary number") }}
+    <label style="font-size: 12px; color: #8b98a8; font-weight: 600; margin-bottom: 4px; display: block; margin-top: 10px;">Metadata (Optional)</label>
+    {{ entity_form.metadata_text(class_="form-control form-control-sm", rows="2", placeholder="e.g., Verified on 2026-06-15, Found in WhatsApp messages") }}
+    {{ entity_form.submit(class_="btn btn-primary btn-sm", value="Link Evidence", style="width: 100%; margin-top: 12px;") }}
+  </form>
+  <form class="panel form-stack" method="post" action="{{ url_for('main.case_add_note', case_id=case.id) }}">
+    <div class="panel-head"><h2><i data-lucide="message-square"></i> Investigation Notes</h2></div>
+    {{ note_form.hidden_tag() }}
+    {{ note_form.author(class_="form-control form-control-sm", placeholder="Officer name") }}
+    {{ note_form.body(class_="form-control form-control-sm", rows="3", placeholder="Add factual investigation note") }}
+    {{ note_form.submit(class_="btn btn-primary btn-sm", value="Add Note", style="width: 100%;") }}
+    {% if case.notes %}
+      <div style="margin-top: 14px; border-top: 1px solid #202b39; padding-top: 12px;">
+        {% for note in case.notes|sort(attribute="created_at", reverse=True) %}
+          <div class="activity">
+            <strong><i data-lucide="user"></i> {{ note.author }}</strong>
+            <span>{{ note.body }}</span>
+            <time><i data-lucide="clock"></i> {{ note.created_at.strftime("%d %b %H:%M") }}</time>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </form>
+</section>
+<script>lucide.createIcons();</script>
+{% endblock %}

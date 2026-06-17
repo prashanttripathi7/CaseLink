@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Investigation Workflow | CaseLink{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><p class="eyebrow">Investigation Workflow</p><h1>How analysts use CaseLink</h1></div>
+  <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}">Create Investigation</a>
+</section>
+
+<section class="panel workflow-panel">
+  <div class="workflow-list">
+    <div class="workflow-step">
+      <span class="step-marker"><i data-lucide="plus"></i></span>
+      <div><strong>Create Investigation</strong><small>Open a structured investigation record.</small></div>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="workflow-step">
+      <span class="step-marker"><i data-lucide="database"></i></span>
+      <div><strong>Add Digital Evidence</strong><small>Phone numbers, names, addresses, license plates, bank accounts, and more.</small></div>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="workflow-step">
+      <span class="step-marker"><i data-lucide="link-2"></i></span>
+      <div><strong>Correlate Evidence</strong><small>Shared identifiers are matched across investigations automatically.</small></div>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="workflow-step">
+      <span class="step-marker"><i data-lucide="lightbulb"></i></span>
+      <div><strong>Detect Relationships</strong><small>Analysts review repeat evidence and linked investigations.</small></div>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="workflow-step">
+      <span class="step-marker"><i data-lucide="network"></i></span>
+      <div><strong>Visualize Networks</strong><small>Open the network graph to inspect connected investigations.</small></div>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="workflow-step">
+      <span class="step-marker"><i data-lucide="file-text"></i></span>
+      <div><strong>Generate Reports</strong><small>Export case-ready findings for review and documentation.</small></div>
+    </div>
+  </div>
+</section>
+<script>lucide.createIcons();</script>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Cases | CaseLink{% endblock %}
+{% block content %}
+<section class="page-heading row-gap">
+  <div><p class="eyebrow">Case Management</p><h1><i data-lucide="briefcase"></i> Investigation Register</h1></div>
+  <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}"><i data-lucide="plus"></i> Create Investigation</a>
+</section>
+<section class="panel">
+  <div class="table-responsive">
+    <table class="table table-dark table-hover align-middle">
+      <thead><tr><th><i data-lucide="hash"></i> Case ID</th><th><i data-lucide="file"></i> FIR Number</th><th><i data-lucide="calendar"></i> Date</th><th><i data-lucide="tag"></i> Investigation Type</th><th><i data-lucide="user"></i> Officer</th><th><i data-lucide="badge"></i> Status</th><th><i data-lucide="database"></i> Evidence</th></tr></thead>
+      <tbody>
+      {% for case in cases %}
+        <tr onclick="window.location='{{ url_for('main.case_detail', case_id=case.id) }}'">
+          <td><strong>{{ case.case_id }}</strong></td><td>{{ case.fir_number }}</td><td>{{ case.complaint_date.strftime("%d %b %Y") }}</td>
+          <td>{{ case.fraud_type }}</td><td>{{ case.investigating_officer }}</td><td><span class="status">{{ case.status }}</span></td><td><span class="badge">{{ case.entities|length }}</span></td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="7">
+            <div class="empty-state">
+              <strong>No investigations found.</strong>
+              <span>Start by creating an investigation and adding digital evidence.</span>
+              <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}">Create Investigation</a>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+<script>lucide.createIcons();</script>
+{% endblock %}

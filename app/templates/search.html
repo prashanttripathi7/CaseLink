@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Search | CaseLink{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">Investigation Search</p><h1><i data-lucide="search"></i> Global Evidence Lookup</h1></div></section>
+<form class="panel search-panel" action="{{ url_for('main.search') }}">
+  <input name="q" value="{{ term }}" placeholder="Enter case ID, phone number, UPI ID, email, bank account, license plate, name, address...">
+  <button class="btn btn-primary btn-sm"><i data-lucide="search"></i> Search</button>
+</form>
+{% if term %}
+<section class="two-column">
+  <div class="panel">
+    <div class="panel-head"><h2><i data-lucide="briefcase"></i> Matching Investigations</h2><span class="badge">{{ results.cases|length }}</span></div>
+    {% for case in results.cases %}
+      <a class="result-row" href="{{ url_for('main.case_detail', case_id=case.id) }}"><strong>{{ case.case_id }}</strong><span>{{ case.fraud_type }}</span><em>{{ case.status }}</em></a>
+    {% else %}<p class="empty"><i data-lucide="inbox"></i> No matching investigations were found.</p>{% endfor %}
+  </div>
+  <div class="panel">
+    <div class="panel-head"><h2><i data-lucide="database"></i> Connected Evidence</h2><span class="badge">{{ results.entities|length }}</span></div>
+    {% for entity in results.entities %}
+      <div class="result-row"><strong>{{ entity.value }}</strong><span>{{ entity.type_label }}</span><em>{{ entity.cases|length }} investigations</em></div>
+    {% else %}<p class="empty"><i data-lucide="inbox"></i> No matching evidence entities were found.</p>{% endfor %}
+  </div>
+</section>
+<section class="panel">
+  <div class="panel-head"><h2><i data-lucide="alert-circle"></i> Investigation Alerts</h2></div>
+  {% for alert in results.alerts %}<div class="finding"><i data-lucide="alert-triangle"></i> {{ alert }}</div>{% else %}<p class="empty">No repeat-entity alert for this search.</p>{% endfor %}
+</section>
+{% if not results.cases and not results.entities and not results.alerts %}
+  <section class="panel">
+    <div class="empty-state">
+      <strong>No matching investigations were found.</strong>
+      <span>Try another identifier or create a new investigation record for this evidence.</span>
+      <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}"><i data-lucide="plus"></i> Create Investigation</a>
+    </div>
+  </section>
+{% endif %}
+{% endif %}
+<script>lucide.createIcons();</script>
+{% endblock %}

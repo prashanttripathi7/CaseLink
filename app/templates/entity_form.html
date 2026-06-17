@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Edit Entity | CaseLink{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><p class="eyebrow">Evidence Management</p><h1>Edit entity</h1></div>
+</section>
+<form method="post" class="panel form-stack">
+  {{ form.hidden_tag() }}
+  {{ form.entity_type.label }}{{ form.entity_type(class_="form-select form-select-sm") }}
+  {{ form.value.label }}{{ form.value(class_="form-control form-control-sm") }}
+  {{ form.label.label }}{{ form.label(class_="form-control form-control-sm") }}
+  {{ form.metadata_text.label }}{{ form.metadata_text(class_="form-control", rows="4") }}
+  <div class="actions">
+    {% if entity.cases %}
+      <a class="btn btn-outline-light btn-sm" href="{{ url_for('main.case_detail', case_id=entity.cases[0].id) }}">Cancel</a>
+    {% else %}
+      <a class="btn btn-outline-light btn-sm" href="{{ url_for('main.case_list') }}">Cancel</a>
+    {% endif %}
+    {{ form.submit(class_="btn btn-primary btn-sm", value="Save Entity") }}
+  </div>
+</form>
+{% endblock %}

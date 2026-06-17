@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | CaseLink{% endblock %}
+{% block content %}
+<section class="page-heading dashboard-heading">
+  <div>
+    <p class="eyebrow">Investigation Dashboard</p>
+  </div>
+</section>
+
+<section class="metric-grid">
+  <div class="metric">
+    <div class="metric-icon"><i data-lucide="briefcase"></i></div>
+    <span>Total Investigations</span>
+    <strong>{{ metrics.total_cases }}</strong>
+  </div>
+  <div class="metric">
+    <div class="metric-icon"><i data-lucide="activity"></i></div>
+    <span>Active Investigations</span>
+    <strong>{{ metrics.active }}</strong>
+  </div>
+  <div class="metric">
+    <div class="metric-icon"><i data-lucide="database"></i></div>
+    <span>Unique Evidence Records</span>
+    <strong>{{ metrics.unique_entities }}</strong>
+  </div>
+  <div class="metric">
+    <div class="metric-icon"><i data-lucide="link-2"></i></div>
+    <span>Linked Investigation Networks</span>
+    <strong>{{ metrics.linked_networks }}</strong>
+  </div>
+  <div class="metric">
+    <div class="metric-icon"><i data-lucide="alert-circle"></i></div>
+    <span>Repeat Evidence Indicators</span>
+    <strong>{{ metrics.repeat_entities }}</strong>
+  </div>
+  <div class="metric">
+    <div class="metric-icon"><i data-lucide="check-circle"></i></div>
+    <span>Closed Investigations</span>
+    <strong>{{ metrics.closed }}</strong>
+  </div>
+</section>
+
+<section class="panel insights-panel">
+  <div class="panel-head">
+    <h2>Investigation Insights</h2>
+    <a href="{{ url_for('main.network') }}">View Network</a>
+  </div>
+  <div class="insight-list">
+    {% for insight in insights %}
+      <div class="finding insight-row">
+        <span>{{ insight.text }}</span>
+        {% if insight.action == "network" %}
+          <a class="btn btn-outline-light btn-sm" href="{{ url_for('main.network') }}">View Network</a>
+        {% elif insight.action == "search" %}
+          <a class="btn btn-outline-light btn-sm" href="{{ url_for('main.search', q=insight.query) }}">Review Evidence</a>
+        {% elif insight.action == "create" %}
+          <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}">Create Investigation</a>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="two-column">
+  <div class="panel">
+    <div class="panel-head"><h2>Correlation Alerts</h2></div>
+    {% if alerts %}
+      <div class="alert-list">
+        {% for entity, count in alerts %}
+          <a class="alert-row" href="{{ url_for('main.search', q=entity.value) }}">
+            <span>{{ entity.type_label }}</span>
+            <strong>{{ entity.value }}</strong>
+            <em>{{ count }} investigations</em>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state compact-empty">
+        <strong>No repeat entities detected yet.</strong>
+        <span>Add digital evidence to allow CaseLink to identify shared identifiers.</span>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}">Create Investigation</a>
+      </div>
+    {% endif %}
+  </div>
+  <div class="panel">
+    <div class="panel-head"><h2>Recent Analyst Activity</h2></div>
+    {% if recent_notes %}
+      {% for note in recent_notes %}
+        <div class="activity">
+          <strong>{{ note.case.case_id }}</strong>
+          <span>{{ note.author }} added a note</span>
+          <time>{{ note.created_at.strftime("%d %b %H:%M") }}</time>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="empty">No analyst activity recorded yet.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Recently Added Investigations</h2>
+    <a href="{{ url_for('main.case_list') }}">View all</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-dark table-hover align-middle">
+      <thead><tr><th>Case ID</th><th>FIR</th><th>Fraud Type</th><th>Officer</th><th>Status</th><th>Entities</th></tr></thead>
+      <tbody>
+        {% for case in recent_cases %}
+          <tr onclick="window.location='{{ url_for('main.case_detail', case_id=case.id) }}'">
+            <td>{{ case.case_id }}</td><td>{{ case.fir_number }}</td><td>{{ case.fraud_type }}</td>
+            <td>{{ case.investigating_officer }}</td><td><span class="status">{{ case.status }}</span></td><td>{{ case.entities|length }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6" class="empty">No investigations found. Start by creating an investigation.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+<script>lucide.createIcons();</script>
+{% endblock %}

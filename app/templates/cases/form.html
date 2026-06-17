@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | CaseLink{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">Case Management</p><h1><i data-lucide="plus"></i> {{ title }}</h1></div></section>
+
+<div style="background: rgba(47, 129, 247, 0.08); border: 1px solid #3a5a8a; border-radius: 8px; padding: 14px; margin-bottom: 16px; font-size: 13px; color: #b8c4d4;">
+  <i data-lucide="info"></i> <strong>How it works:</strong> Fill in the investigation details below. Once saved, you'll be able to add digital evidence (phone numbers, names, addresses, license plates, bank accounts, etc.) on the investigation detail page. CaseLink will automatically link cases that share evidence.
+</div>
+
+<form method="post" class="panel form-grid">
+  {{ form.hidden_tag() }}
+  {% for field in [form.case_id, form.fir_number, form.complaint_date, form.fraud_type, form.investigating_officer, form.status, form.victim_name, form.victim_contact] %}
+    <label>{{ field.label.text }}{{ field(class_="form-control form-control-sm") }}</label>
+  {% endfor %}
+  <label class="span-2">{{ form.investigation_notes.label.text }}{{ form.investigation_notes(class_="form-control form-control-sm", rows="5") }}</label>
+  <div class="span-2 actions">
+    <a class="btn btn-outline-light btn-sm" href="{{ url_for('main.case_list') }}">Cancel</a>
+    {{ form.submit(class_="btn btn-primary btn-sm") }}
+  </div>
+</form>
+
+<script>lucide.createIcons();</script>
+{% endblock %}

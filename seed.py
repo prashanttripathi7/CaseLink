@@ -6,7 +6,7 @@ from app.models import Case, Entity, InvestigationNote, db
 
 CASES = [
     {
-        "case_id": "LS-CCU-2026-001",
+        "case_id": "CASE-001",
         "fir_number": "FIR/142/2026",
         "complaint_date": date(2026, 5, 18),
         "fraud_type": "UPI refund fraud",
@@ -18,7 +18,7 @@ CASES = [
         "entities": [("phone", "+91-88220-44119"), ("upi", "supportdesk@upi"), ("bank", "ACCT-XX3921")],
     },
     {
-        "case_id": "LS-CCU-2026-002",
+        "case_id": "CASE-002",
         "fir_number": "FIR/151/2026",
         "complaint_date": date(2026, 5, 26),
         "fraud_type": "Loan application fraud",
@@ -30,7 +30,7 @@ CASES = [
         "entities": [("phone", "+91-88220-44119"), ("upi", "loanverify@upi"), ("email", "kycdesk.secure@mail.example")],
     },
     {
-        "case_id": "LS-CCU-2026-003",
+        "case_id": "CASE-003",
         "fir_number": "FIR/166/2026",
         "complaint_date": date(2026, 6, 4),
         "fraud_type": "Marketplace advance payment fraud",

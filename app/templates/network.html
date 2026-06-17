@@ -13,7 +13,13 @@
     </div>
 </section>
 
-<form class="panel" method="get">
+<details class="panel" style="margin-bottom:16px;">
+<summary style="cursor:pointer;font-weight:600;font-size:14px;padding:4px 0;">
+    <i data-lucide="filter"></i>
+    Evidence Filters
+</summary>
+
+<form method="get" style="margin-top:16px;">
 
     <div class="filter-title">
         <i data-lucide="filter"></i>
@@ -50,6 +56,7 @@
     </div>
 
 </form>
+</details>
 
 {% if has_network_data %}
 

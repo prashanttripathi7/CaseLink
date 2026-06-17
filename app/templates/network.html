@@ -1,47 +1,112 @@
 {% extends "base.html" %}
 {% block title %}Evidence Network | CaseLink{% endblock %}
+
 {% block content %}
+
 <section class="page-heading row-gap">
-  <div><p class="eyebrow">Evidence Network Visualization</p><h1><i data-lucide="network"></i> Interactive Link Graph</h1></div>
+    <div>
+        <p class="eyebrow">Evidence Network Visualization</p>
+        <h1>
+            <i data-lucide="share-2"></i>
+            Interactive Link Graph
+        </h1>
+    </div>
 </section>
 
-<form class="panel filter-bar" method="get" style="background: linear-gradient(135deg, rgba(47, 129, 247, 0.05) 0%, transparent 100%); border-color: #3a5a8a; margin-bottom: 16px;">
-  <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; width: 100%;">
-    <span style="font-weight: 600; font-size: 12px; color: #8b98a8;"><i data-lucide="filter"></i> Filter by Evidence Type:</span>
-    {% for key, label in entity_types %}
-      <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px;">
-        <input type="checkbox" name="type" value="{{ key }}" {% if key in selected_types %}checked{% endif %} style="cursor: pointer;">
-        {{ label }}
-      </label>
-    {% endfor %}
-  </div>
-  <div style="display: flex; gap: 10px; margin-top: 12px;">
-    <button class="btn btn-primary btn-sm" style="white-space: nowrap;"><i data-lucide="filter"></i> Apply Filters</button>
-    <a class="btn btn-outline-light btn-sm" href="{{ url_for('main.network') }}" style="white-space: nowrap;"><i data-lucide="x"></i> Reset</a>
-  </div>
+<form class="panel" method="get">
+
+    <div class="filter-title">
+        <i data-lucide="filter"></i>
+        <span>Filter by Evidence Type</span>
+    </div>
+
+    <div class="evidence-filter-grid">
+        {% for key, label in entity_types %}
+        <label class="evidence-filter-item">
+            <input
+                type="checkbox"
+                name="type"
+                value="{{ key }}"
+                {% if key in selected_types %}checked{% endif %}
+            >
+            <span>{{ label }}</span>
+        </label>
+        {% endfor %}
+    </div>
+
+    <div class="filter-actions">
+        <button type="submit" class="btn btn-primary btn-sm">
+            <i data-lucide="filter"></i>
+            Apply Filters
+        </button>
+
+        <a
+            href="{{ url_for('main.network') }}"
+            class="btn btn-outline-light btn-sm"
+        >
+            <i data-lucide="x"></i>
+            Reset
+        </a>
+    </div>
+
 </form>
 
 {% if has_network_data %}
-  <section class="graph-shell">
-    <iframe src="{{ url_for('main.network_frame') }}" title="Evidence relationship network"></iframe>
-  </section>
-  <section class="panel" style="margin-top: 16px; background: rgba(47, 129, 247, 0.05); border-color: #3a5a8a;">
-    <div style="display: flex; gap: 12px; align-items: start; font-size: 12px;">
-      <i data-lucide="info"></i>
-      <div>
-        <strong>Reading the network:</strong> Each node represents a case or evidence entity. Lines connecting nodes show shared evidence. Tighter clusters indicate more interconnected investigations. Hover over nodes and edges to see details.
-      </div>
+
+<section class="graph-shell">
+    <iframe
+        src="{{ url_for('main.network_frame') }}"
+        title="Evidence relationship network">
+    </iframe>
+</section>
+
+<section
+    class="panel"
+    style="margin-top:16px;background:rgba(47,129,247,0.05);border-color:#3a5a8a;"
+>
+    <div style="display:flex;gap:12px;align-items:flex-start;">
+        <i data-lucide="info"></i>
+
+        <div>
+            <strong>Reading the Network</strong>
+            <p style="margin:6px 0 0 0;">
+                Each node represents an investigation or evidence entity.
+                Connections indicate shared evidence and relationships.
+                Dense clusters may reveal hidden investigative links across
+                multiple cases.
+            </p>
+        </div>
     </div>
-  </section>
+</section>
+
 {% else %}
-  <section class="panel">
+
+<section class="panel">
     <div class="empty-state">
-      <i data-lucide="network"></i>
-      <strong>No linked entities detected yet.</strong>
-      <span>Add shared phone numbers, names, addresses, license plates, bank accounts, or IP addresses across investigations to begin network analysis.</span>
-      <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}"><i data-lucide="plus"></i> Create Investigation</a>
+        <i data-lucide="share-2"></i>
+
+        <strong>No linked entities detected yet.</strong>
+
+        <span>
+            Add shared evidence such as phone numbers, vehicles,
+            identities, addresses, devices, documents, or financial
+            records to begin network analysis.
+        </span>
+
+        <a
+            class="btn btn-primary btn-sm"
+            href="{{ url_for('main.case_new') }}"
+        >
+            <i data-lucide="plus"></i>
+            Create Investigation
+        </a>
     </div>
-  </section>
+</section>
+
 {% endif %}
-<script>lucide.createIcons();</script>
+
+<script>
+    lucide.createIcons();
+</script>
+
 {% endblock %}

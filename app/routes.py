@@ -2,8 +2,8 @@ from pathlib import Path
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, send_file, url_for
 
-from .forms import CaseForm, EntityForm, NoteForm
-from .models import Case, Entity, InvestigationNote, db
+from .forms import CaseForm, DeleteForm, EntityForm, NoteForm
+from .models import CASE_STATUSES, Case, Entity, InvestigationNote, db
 from .services.analysis import (
     case_relationships,
     dashboard_metrics,
@@ -47,7 +47,13 @@ def case_list():
     if status:
         query = query.filter_by(status=status)
     cases = query.order_by(Case.updated_at.desc()).all()
-    return render_template("cases/list.html", cases=cases, status=status)
+    return render_template(
+        "cases/list.html",
+        cases=cases,
+        status=status,
+        status_options=CASE_STATUSES,
+        delete_form=DeleteForm(),
+    )
 
 
 @main_bp.route("/cases/new", methods=["GET", "POST"])
@@ -68,12 +74,14 @@ def case_detail(case_id):
     case = Case.query.get_or_404(case_id)
     entity_form = EntityForm()
     note_form = NoteForm()
+    delete_form = DeleteForm()
     relationships = case_relationships(case)
     return render_template(
         "cases/detail.html",
         case=case,
         entity_form=entity_form,
         note_form=note_form,
+        delete_form=delete_form,
         relationships=relationships,
     )
 
@@ -88,6 +96,29 @@ def case_edit(case_id):
         flash("Investigation updated.", "success")
         return redirect(url_for("main.case_detail", case_id=case.id))
     return render_template("cases/form.html", form=form, title=f"Edit {case.case_id}")
+
+
+@main_bp.route("/cases/<int:case_id>/delete", methods=["POST"])
+def case_delete(case_id):
+    case = Case.query.get_or_404(case_id)
+    form = DeleteForm()
+    if not form.validate_on_submit():
+        flash("Unable to delete investigation. Please try again.", "danger")
+        return redirect(url_for("main.case_detail", case_id=case.id))
+
+    case_label = case.case_id
+    linked_entities = list(case.entities)
+    case.entities.clear()
+    db.session.delete(case)
+    db.session.flush()
+
+    for entity in linked_entities:
+        if not entity.cases:
+            db.session.delete(entity)
+
+    db.session.commit()
+    flash(f"Investigation {case_label} deleted.", "success")
+    return redirect(url_for("main.case_list"))
 
 
 @main_bp.route("/cases/<int:case_id>/entities", methods=["POST"])

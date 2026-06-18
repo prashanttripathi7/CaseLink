@@ -32,3 +32,7 @@ class NoteForm(FlaskForm):
     author = StringField("Officer", validators=[DataRequired(), Length(max=120)])
     body = TextAreaField("Investigation Note", validators=[DataRequired()])
     submit = SubmitField("Add Note")
+
+
+class DeleteForm(FlaskForm):
+    submit = SubmitField("Delete")

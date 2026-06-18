@@ -2,25 +2,72 @@
 {% block title %}Cases | CaseLink{% endblock %}
 {% block content %}
 <section class="page-heading row-gap">
-  <div><p class="eyebrow">Case Management</p><h1><i data-lucide="briefcase"></i> Investigation Register</h1></div>
+  <div>
+    <p class="eyebrow">Case Management</p>
+    <h1><i data-lucide="briefcase"></i> Investigation Register</h1>
+  </div>
   <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}"><i data-lucide="plus"></i> Create Investigation</a>
 </section>
+
+<section class="panel toolbar-panel">
+  <form class="filter-bar" method="get">
+    <label for="status">Status</label>
+    <select id="status" name="status" class="form-select form-select-sm">
+      <option value="">All investigations</option>
+      {% for option in status_options %}
+        <option value="{{ option }}" {% if status == option %}selected{% endif %}>{{ option }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-primary btn-sm" type="submit"><i data-lucide="filter"></i> Apply</button>
+    {% if status %}
+      <a class="btn btn-outline-light btn-sm" href="{{ url_for('main.case_list') }}"><i data-lucide="x"></i> Clear</a>
+    {% endif %}
+  </form>
+</section>
+
 <section class="panel">
   <div class="table-responsive">
-    <table class="table table-dark table-hover align-middle">
-      <thead><tr><th><i data-lucide="hash"></i> Case ID</th><th><i data-lucide="file"></i> FIR Number</th><th><i data-lucide="calendar"></i> Date</th><th><i data-lucide="tag"></i> Investigation Type</th><th><i data-lucide="user"></i> Officer</th><th><i data-lucide="badge"></i> Status</th><th><i data-lucide="database"></i> Evidence</th></tr></thead>
+    <table class="table table-hover align-middle data-table">
+      <thead>
+        <tr>
+          <th><i data-lucide="hash"></i> Case ID</th>
+          <th><i data-lucide="file"></i> FIR Number</th>
+          <th><i data-lucide="calendar"></i> Date</th>
+          <th><i data-lucide="tag"></i> Type</th>
+          <th><i data-lucide="user"></i> Officer</th>
+          <th><i data-lucide="badge"></i> Status</th>
+          <th><i data-lucide="database"></i> Evidence</th>
+          <th class="action-cell">Actions</th>
+        </tr>
+      </thead>
       <tbody>
       {% for case in cases %}
-        <tr onclick="window.location='{{ url_for('main.case_detail', case_id=case.id) }}'">
-          <td><strong>{{ case.case_id }}</strong></td><td>{{ case.fir_number }}</td><td>{{ case.complaint_date.strftime("%d %b %Y") }}</td>
-          <td>{{ case.fraud_type }}</td><td>{{ case.investigating_officer }}</td><td><span class="status">{{ case.status }}</span></td><td><span class="badge">{{ case.entities|length }}</span></td>
+        <tr>
+          <td>
+            <a class="case-link" href="{{ url_for('main.case_detail', case_id=case.id) }}">
+              <strong>{{ case.case_id }}</strong>
+              <small>{{ case.victim_name }}</small>
+            </a>
+          </td>
+          <td>{{ case.fir_number }}</td>
+          <td>{{ case.complaint_date.strftime("%d %b %Y") }}</td>
+          <td>{{ case.fraud_type }}</td>
+          <td>{{ case.investigating_officer }}</td>
+          <td><span class="status status-{{ case.status|lower|replace(' ', '-') }}">{{ case.status }}</span></td>
+          <td><span class="badge">{{ case.entities|length }}</span></td>
+          <td class="action-cell">
+            <a class="btn btn-outline-light btn-icon btn-sm" href="{{ url_for('main.case_edit', case_id=case.id) }}" aria-label="Edit {{ case.case_id }}" title="Edit"><i data-lucide="pencil"></i></a>
+            <form method="post" action="{{ url_for('main.case_delete', case_id=case.id) }}" data-confirm="Delete investigation {{ case.case_id }}? This removes the case and its notes.">
+              {{ delete_form.hidden_tag() }}
+              <button class="btn btn-danger btn-icon btn-sm" type="submit" aria-label="Delete {{ case.case_id }}" title="Delete"><i data-lucide="trash-2"></i></button>
+            </form>
+          </td>
         </tr>
       {% else %}
         <tr>
-          <td colspan="7">
+          <td colspan="8">
             <div class="empty-state">
               <strong>No investigations found.</strong>
-              <span>Start by creating an investigation and adding digital evidence.</span>
               <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}">Create Investigation</a>
             </div>
           </td>

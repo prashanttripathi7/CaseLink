@@ -13,13 +13,13 @@
     </div>
 </section>
 
-<details class="panel" style="margin-bottom:16px;">
-<summary style="cursor:pointer;font-weight:600;font-size:14px;padding:4px 0;">
+<details class="panel filter-panel">
+<summary>
     <i data-lucide="filter"></i>
     Evidence Filters
 </summary>
 
-<form method="get" style="margin-top:16px;">
+<form method="get">
 
     <div class="filter-title">
         <i data-lucide="filter"></i>
@@ -65,25 +65,6 @@
         src="{{ url_for('main.network_frame') }}"
         title="Evidence relationship network">
     </iframe>
-</section>
-
-<section
-    class="panel"
-    style="margin-top:16px;background:rgba(47,129,247,0.05);border-color:#3a5a8a;"
->
-    <div style="display:flex;gap:12px;align-items:flex-start;">
-        <i data-lucide="info"></i>
-
-        <div>
-            <strong>Reading the Network</strong>
-            <p style="margin:6px 0 0 0;">
-                Each node represents an investigation or evidence entity.
-                Connections indicate shared evidence and relationships.
-                Dense clusters may reveal hidden investigative links across
-                multiple cases.
-            </p>
-        </div>
-    </div>
 </section>
 
 {% else %}

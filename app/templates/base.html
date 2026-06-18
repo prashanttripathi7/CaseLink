@@ -18,12 +18,12 @@
           <small>Connecting Evidence. Accelerating Investigations.</small>
         </div>
       </div>
-      <nav class="nav flex-column">
-        <a class="nav-link" href="{{ url_for('main.dashboard') }}"><i data-lucide="gauge"></i><span>Dashboard</span></a>
-        <a class="nav-link" href="{{ url_for('main.case_list') }}"><i data-lucide="briefcase"></i><span>Cases</span></a>
-        <a class="nav-link" href="{{ url_for('main.search') }}"><i data-lucide="search"></i><span>Search</span></a>
-        <a class="nav-link" href="{{ url_for('main.network') }}"><i data-lucide="network"></i><span>Network</span></a>
-        <a class="nav-link" href="{{ url_for('main.workflow') }}"><i data-lucide="workflow"></i><span>Workflow</span></a>
+      <nav class="nav flex-column" aria-label="Primary navigation">
+        <a class="nav-link {{ 'active' if request.endpoint == 'main.dashboard' }}" href="{{ url_for('main.dashboard') }}" {% if request.endpoint == 'main.dashboard' %}aria-current="page"{% endif %}><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+        <a class="nav-link {{ 'active' if request.endpoint in ['main.case_list', 'main.case_new', 'main.case_detail', 'main.case_edit'] }}" href="{{ url_for('main.case_list') }}" {% if request.endpoint in ['main.case_list', 'main.case_new', 'main.case_detail', 'main.case_edit'] %}aria-current="page"{% endif %}><i data-lucide="briefcase"></i><span>Cases</span></a>
+        <a class="nav-link {{ 'active' if request.endpoint == 'main.search' }}" href="{{ url_for('main.search') }}" {% if request.endpoint == 'main.search' %}aria-current="page"{% endif %}><i data-lucide="search"></i><span>Search</span></a>
+        <a class="nav-link {{ 'active' if request.endpoint in ['main.network', 'main.network_frame'] }}" href="{{ url_for('main.network') }}" {% if request.endpoint in ['main.network', 'main.network_frame'] %}aria-current="page"{% endif %}><i data-lucide="network"></i><span>Network</span></a>
+        <a class="nav-link {{ 'active' if request.endpoint == 'main.workflow' }}" href="{{ url_for('main.workflow') }}" {% if request.endpoint == 'main.workflow' %}aria-current="page"{% endif %}><i data-lucide="workflow"></i><span>Workflow</span></a>
       </nav>
       <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
       <script>lucide.createIcons();</script>
@@ -31,9 +31,10 @@
     <main class="content">
       <header class="topbar">
         <form class="quick-search" action="{{ url_for('main.search') }}">
-          <input name="q" value="{{ request.args.get('q', '') }}" placeholder="Search investigation, phone, name, license plate, evidence...">
+          <i data-lucide="search"></i>
+          <input name="q" value="{{ request.args.get('q', '') }}" placeholder="Search cases, people, phones, vehicles, evidence...">
         </form>
-        <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}">New Investigation</a>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}"><i data-lucide="plus"></i> New Investigation</a>
       </header>
 
       {% with messages = get_flashed_messages(with_categories=true) %}

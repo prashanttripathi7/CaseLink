@@ -3,7 +3,8 @@
 {% block content %}
 <section class="page-heading dashboard-heading">
   <div>
-    <p class="eyebrow">Investigation Dashboard</p>
+    <p class="eyebrow">Command Center</p>
+    <h1><i data-lucide="layout-dashboard"></i> Investigation Dashboard</h1>
   </div>
 </section>
 
@@ -42,7 +43,7 @@
 
 <section class="panel insights-panel">
   <div class="panel-head">
-    <h2>Investigation Insights</h2>
+    <h2><i data-lucide="sparkles"></i> Investigation Insights</h2>
     <a href="{{ url_for('main.network') }}">View Network</a>
   </div>
   <div class="insight-list">
@@ -63,7 +64,7 @@
 
 <section class="two-column">
   <div class="panel">
-    <div class="panel-head"><h2>Correlation Alerts</h2></div>
+    <div class="panel-head"><h2><i data-lucide="alert-triangle"></i> Correlation Alerts</h2></div>
     {% if alerts %}
       <div class="alert-list">
         {% for entity, count in alerts %}
@@ -77,13 +78,12 @@
     {% else %}
       <div class="empty-state compact-empty">
         <strong>No repeat entities detected yet.</strong>
-        <span>Add digital evidence to allow CaseLink to identify shared identifiers.</span>
         <a class="btn btn-primary btn-sm" href="{{ url_for('main.case_new') }}">Create Investigation</a>
       </div>
     {% endif %}
   </div>
   <div class="panel">
-    <div class="panel-head"><h2>Recent Analyst Activity</h2></div>
+    <div class="panel-head"><h2><i data-lucide="clock-3"></i> Recent Analyst Activity</h2></div>
     {% if recent_notes %}
       {% for note in recent_notes %}
         <div class="activity">
@@ -100,17 +100,17 @@
 
 <section class="panel">
   <div class="panel-head">
-    <h2>Recently Added Investigations</h2>
+    <h2><i data-lucide="briefcase"></i> Recently Added Investigations</h2>
     <a href="{{ url_for('main.case_list') }}">View all</a>
   </div>
   <div class="table-responsive">
-    <table class="table table-dark table-hover align-middle">
+    <table class="table table-hover align-middle data-table">
       <thead><tr><th>Case ID</th><th>FIR</th><th>Fraud Type</th><th>Officer</th><th>Status</th><th>Entities</th></tr></thead>
       <tbody>
         {% for case in recent_cases %}
           <tr onclick="window.location='{{ url_for('main.case_detail', case_id=case.id) }}'">
             <td>{{ case.case_id }}</td><td>{{ case.fir_number }}</td><td>{{ case.fraud_type }}</td>
-            <td>{{ case.investigating_officer }}</td><td><span class="status">{{ case.status }}</span></td><td>{{ case.entities|length }}</td>
+            <td>{{ case.investigating_officer }}</td><td><span class="status status-{{ case.status|lower|replace(' ', '-') }}">{{ case.status }}</span></td><td><span class="badge">{{ case.entities|length }}</span></td>
           </tr>
         {% else %}
           <tr><td colspan="6" class="empty">No investigations found. Start by creating an investigation.</td></tr>

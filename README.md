@@ -3,7 +3,7 @@
   <h1>CaseLink</h1>
   <h3>Investigation Link Analysis &amp; Intelligence Platform</h3>
   <p><strong>Connecting Evidence. Accelerating Investigations.</strong></p>
-  <p><sub>Designed to assist law enforcement and investigators in uncovering hidden relationships across investigations through entity correlation, network visualization, and investigation reporting. Supports cybercrime, vehicle theft, missing persons, financial fraud, property crime, and organized crime investigations.</sub></p>
+  <p><sub>A clean investigation link analysis platform for managing cases, correlating shared evidence, visualizing hidden networks, searching records, exporting case data, and generating reports for cybercrime, financial fraud, vehicle, identity, property, witness, and organized crime investigations.</sub></p>
 </div>
 
 ## Overview
@@ -12,7 +12,7 @@ Investigators across multiple domains receive numerous case reports containing s
 
 Identifying hidden relationships between these cases manually is time-consuming and increases the risk of missing organized patterns.
 
-CaseLink is a general-purpose investigation intelligence platform that assists investigators in uncovering relationships across investigations through automated evidence correlation, interactive network visualization, and investigation reporting.
+CaseLink is a general-purpose investigation intelligence platform that helps investigators create and manage cases, add evidence entities, detect direct and indirect relationships, visualize case networks, search across records, export case data, and generate case reports.
 
 ## Architecture / Workflow
 
@@ -40,13 +40,15 @@ PDF Report Generation
 
 ## Features
 
+- Creates, edits, filters, exports, and deletes investigation records.
 - Correlates shared evidence across investigations.
 - Detects direct and indirect relationships between cases.
 - Identifies repeat evidence appearing in multiple investigations.
-- Generates analyst-friendly investigation insights.
+- Provides dashboard insights, work queues, and recent activity.
 - Visualizes evidence networks using interactive graphs.
 - Produces professional PDF investigation reports.
 - Provides investigation-wide search capabilities.
+- Supports note management and quick copy/search actions for evidence.
 
 ## Technology Stack
 
@@ -61,7 +63,7 @@ PDF Report Generation
 
 ## User Interface
 
-CaseLink features a clean, dark-themed investigation intelligence dashboard with:
+CaseLink features a clean, simple investigation dashboard built for fast police demos and daily analyst use:
 
 ### Dashboard Metrics
 - **Total Investigations**: Overview of all active and closed cases
@@ -72,13 +74,15 @@ CaseLink features a clean, dark-themed investigation intelligence dashboard with
 - **Investigation Insights**: AI-generated findings from correlation analysis
 
 ### Key Features
-- 🔍 **Global Evidence Search**: Find cases and entities across the entire system
-- 📊 **Investigation Metrics**: Real-time dashboard with actionable statistics
-- 🕸️ **Network Visualization**: Interactive graph showing evidence relationships
-- 📋 **Case Management**: Create, update, and track investigations
-- ⚡ **Evidence Correlation**: Automated detection of shared identifiers
-- 📄 **Report Generation**: Export findings in professional PDF format
-- 🎨 **Clean UI**: Dark theme with Lucide icons for intuitive navigation
+- **Global Evidence Search**: Find cases and entities across the entire system
+- **Advanced Case Register**: Filter by keyword, status, evidence type, and sort order
+- **CSV Export**: Export filtered case lists for review or briefing
+- **Investigation Metrics**: Dashboard with actionable statistics and work queues
+- **Network Visualization**: Interactive graph showing evidence relationships
+- **Case Management**: Create, update, delete, and track investigations
+- **Evidence Correlation**: Automated detection of shared identifiers
+- **Report Generation**: Export case-ready findings in professional PDF format
+- **Clean UI**: Simple responsive layout with Lucide icons and readable cards
 
 ### Supported Evidence Types
 - **Cyber Fraud**: Phone, UPI, Bank Account, Email, IP Address
@@ -98,29 +102,41 @@ CaseLink features a clean, dark-themed investigation intelligence dashboard with
 ## Example Investigation
 
 ```text
-Case CL-CCU-2026-001
+CASE-001
 Phone: +91-88220-44119
-UPI: loanverify@upi
+UPI: refunddesk@upi
+Bank: ACCT-DEMO-3921
 
-Case CL-CCU-2026-002
+CASE-002
 Phone: +91-88220-44119
+IP: 103.88.44.21
 
-Case CL-CCU-2026-003
+CASE-003
 UPI: loanverify@upi
+Bank: ACCT-DEMO-3921
+Vehicle Plate: MH-12-DE-9090
+
+CASE-004
+Vehicle Plate: MH-12-DE-9090
+Alias: Raka
 ```
 
 CaseLink detects the relationship pattern:
 
 ```text
-CL-CCU-2026-001
+CASE-001
         |
      Phone
         |
-CL-CCU-2026-002
+CASE-002
         |
-      UPI
+       IP
         |
-CL-CCU-2026-003
+CASE-003
+        |
+ Vehicle Plate
+        |
+CASE-004
 ```
 
 This helps investigators uncover hidden relationships across complaints that may otherwise appear unrelated during manual review.
@@ -147,7 +163,7 @@ This helps investigators uncover hidden relationships across complaints that may
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
-python seed.py
+python demo_police_cases.py
 python run.py
 ```
 
@@ -157,7 +173,7 @@ python run.py
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python seed.py
+python3 demo_police_cases.py
 python run.py
 ```
 
@@ -167,6 +183,31 @@ Open:
 http://127.0.0.1:5000
 ```
 
+Useful demo pages:
+
+```text
+http://127.0.0.1:5000/cases
+http://127.0.0.1:5000/network
+http://127.0.0.1:5000/search
+```
+
+## Police Demo Data
+
+The demo file `demo_police_cases.py` loads connected cases from `CASE-001` to `CASE-010`.
+
+It covers cyber fraud, loan fraud, marketplace fraud, vehicle theft, property fraud, identity misuse, weapon/extortion evidence, document forgery, witness information, and organized crime coordination.
+
+It also includes all supported evidence types: phone, UPI, bank account, email, IP address, license plate, VIN, address, Aadhaar, passport, suspect name, alias, weapon, mobile device, document, serial number, and witness.
+
+You can rerun the demo script before a presentation:
+
+```bash
+python3 demo_police_cases.py
+python3 run.py
+```
+
+The script refreshes only demo cases `CASE-001` to `CASE-010`.
+
 ## Notes
 
-The local database file is created at `instance/caselink.sqlite3`. The seed script provides demonstration investigation records for evaluation and testing.
+The local database file is created at `instance/linksutra.sqlite3`. The police demo script provides connected investigation records for evaluation, demonstration, and testing.

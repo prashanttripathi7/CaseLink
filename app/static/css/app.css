@@ -293,6 +293,42 @@ input,
   margin-bottom: 20px;
 }
 
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.action-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 14px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  font-weight: 800;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.action-card:hover {
+  color: var(--accent-strong);
+  background: #fbfffc;
+  border-color: #9ab9ae;
+  transform: translateY(-1px);
+}
+
+.action-card i[data-lucide] {
+  width: 20px;
+  height: 20px;
+  margin-right: 0;
+  color: var(--accent-strong);
+}
+
 .metric,
 .panel,
 .graph-shell {
@@ -365,6 +401,35 @@ input,
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 14px;
   margin-bottom: 14px;
+}
+
+.case-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.summary-tile {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.summary-tile span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.summary-tile strong {
+  color: var(--text);
+  font-size: 22px;
+  line-height: 1.1;
 }
 
 .panel {
@@ -519,6 +584,13 @@ input,
   font-size: 12px;
 }
 
+.result-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .insights-panel {
   border-color: #c1d8d0;
   background: #fbfffc;
@@ -533,6 +605,41 @@ input,
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   margin-bottom: 0;
+}
+
+.queue-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.queue-grid h3 {
+  color: #445146;
+  font-size: 13px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.queue-row {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  color: var(--text);
+  background: var(--surface-3);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.queue-row:hover {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-color: #9ab9ae;
+}
+
+.queue-row span {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .empty,
@@ -696,10 +803,17 @@ time {
   display: flex;
   gap: 6px;
   margin-top: 6px;
+  flex-wrap: wrap;
 }
 
 .entity-actions form {
   display: inline-flex;
+}
+
+.is-copied {
+  background: var(--accent-soft) !important;
+  border-color: #9ab9ae !important;
+  color: var(--accent-strong) !important;
 }
 
 .form-grid {
@@ -743,7 +857,8 @@ time {
 .filter-bar {
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: flex-end;
+  flex-wrap: wrap;
 }
 
 .filter-bar label {
@@ -754,6 +869,19 @@ time {
 
 .filter-bar .form-select {
   max-width: 240px;
+}
+
+.filter-search {
+  flex: 1 1 280px;
+  min-width: 240px;
+}
+
+.filter-bar .field-label {
+  min-width: 170px;
+}
+
+.filter-bar .btn {
+  min-height: 32px;
 }
 
 .graph-shell {
@@ -836,6 +964,17 @@ time {
   padding-top: 12px;
 }
 
+.activity-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.activity-head form {
+  display: inline-flex;
+}
+
 .flash-stack {
   margin-bottom: 14px;
 }
@@ -853,6 +992,11 @@ time {
 @media (max-width: 1200px) {
   .metric-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .quick-actions,
+  .case-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .evidence-filter-grid {
@@ -890,8 +1034,11 @@ time {
   }
 
   .metric-grid,
+  .quick-actions,
+  .case-summary-grid,
   .form-grid,
-  .evidence-filter-grid {
+  .evidence-filter-grid,
+  .queue-grid {
     grid-template-columns: 1fr;
   }
 
@@ -909,6 +1056,11 @@ time {
 
   .filter-bar .form-select {
     max-width: none;
+  }
+
+  .filter-search,
+  .filter-bar .field-label {
+    min-width: 0;
   }
 
   .insight-row {

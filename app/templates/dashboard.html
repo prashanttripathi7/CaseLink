@@ -41,6 +41,25 @@
   </div>
 </section>
 
+<section class="quick-actions">
+  <a class="action-card" href="{{ url_for('main.case_new') }}">
+    <i data-lucide="plus"></i>
+    <span>Create Case</span>
+  </a>
+  <a class="action-card" href="{{ url_for('main.search') }}">
+    <i data-lucide="search"></i>
+    <span>Search Evidence</span>
+  </a>
+  <a class="action-card" href="{{ url_for('main.network') }}">
+    <i data-lucide="network"></i>
+    <span>Open Network</span>
+  </a>
+  <a class="action-card" href="{{ url_for('main.case_export') }}">
+    <i data-lucide="download"></i>
+    <span>Export Cases</span>
+  </a>
+</section>
+
 <section class="panel insights-panel">
   <div class="panel-head">
     <h2><i data-lucide="sparkles"></i> Investigation Insights</h2>
@@ -64,6 +83,33 @@
 
 <section class="two-column">
   <div class="panel">
+    <div class="panel-head"><h2><i data-lucide="list-todo"></i> Work Queue</h2></div>
+    <div class="queue-grid">
+      <div>
+        <h3>Needs Evidence</h3>
+        {% for case in needs_evidence %}
+          <a class="queue-row" href="{{ url_for('main.case_detail', case_id=case.id) }}">
+            <strong>{{ case.case_id }}</strong>
+            <span>{{ case.fraud_type }}</span>
+          </a>
+        {% else %}
+          <p class="empty">No cases waiting for evidence.</p>
+        {% endfor %}
+      </div>
+      <div>
+        <h3>Needs Notes</h3>
+        {% for case in needs_notes %}
+          <a class="queue-row" href="{{ url_for('main.case_detail', case_id=case.id) }}">
+            <strong>{{ case.case_id }}</strong>
+            <span>{{ case.investigating_officer }}</span>
+          </a>
+        {% else %}
+          <p class="empty">No cases waiting for notes.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="panel">
     <div class="panel-head"><h2><i data-lucide="alert-triangle"></i> Correlation Alerts</h2></div>
     {% if alerts %}
       <div class="alert-list">
@@ -82,20 +128,21 @@
       </div>
     {% endif %}
   </div>
-  <div class="panel">
-    <div class="panel-head"><h2><i data-lucide="clock-3"></i> Recent Analyst Activity</h2></div>
-    {% if recent_notes %}
-      {% for note in recent_notes %}
-        <div class="activity">
-          <strong>{{ note.case.case_id }}</strong>
-          <span>{{ note.author }} added a note</span>
-          <time>{{ note.created_at.strftime("%d %b %H:%M") }}</time>
-        </div>
-      {% endfor %}
-    {% else %}
-      <p class="empty">No analyst activity recorded yet.</p>
-    {% endif %}
-  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head"><h2><i data-lucide="clock-3"></i> Recent Analyst Activity</h2></div>
+  {% if recent_notes %}
+    {% for note in recent_notes %}
+      <div class="activity">
+        <strong>{{ note.case.case_id }}</strong>
+        <span>{{ note.author }} added a note</span>
+        <time>{{ note.created_at.strftime("%d %b %H:%M") }}</time>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="empty">No analyst activity recorded yet.</p>
+  {% endif %}
 </section>
 
 <section class="panel">

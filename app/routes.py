@@ -1,6 +1,9 @@
+import csv
+import io
 from pathlib import Path
 
-from flask import Blueprint, current_app, flash, redirect, render_template, request, send_file, url_for
+from flask import Blueprint, Response, current_app, flash, redirect, render_template, request, send_file, url_for
+from sqlalchemy import or_
 
 from .forms import CaseForm, DeleteForm, EntityForm, NoteForm
 from .models import CASE_STATUSES, Case, Entity, InvestigationNote, db
@@ -18,6 +21,47 @@ from .services.visualization import generate_network_html
 main_bp = Blueprint("main", __name__)
 
 
+def _case_query_from_args(args):
+    status = args.get("status", "").strip()
+    term = args.get("q", "").strip()
+    entity_type = args.get("entity_type", "").strip()
+    sort = args.get("sort", "updated_desc").strip()
+
+    query = Case.query
+    if term or entity_type:
+        query = query.outerjoin(Case.entities)
+
+    if status:
+        query = query.filter(Case.status == status)
+
+    if entity_type:
+        query = query.filter(Entity.entity_type == entity_type)
+
+    if term:
+        like = f"%{term}%"
+        query = query.filter(
+            or_(
+                Case.case_id.ilike(like),
+                Case.fir_number.ilike(like),
+                Case.fraud_type.ilike(like),
+                Case.investigating_officer.ilike(like),
+                Case.victim_name.ilike(like),
+                Case.victim_contact.ilike(like),
+                Entity.value.ilike(like),
+                Entity.label.ilike(like),
+                Entity.metadata_text.ilike(like),
+            )
+        )
+
+    sort_map = {
+        "updated_desc": Case.updated_at.desc(),
+        "date_desc": Case.complaint_date.desc(),
+        "date_asc": Case.complaint_date.asc(),
+        "case_id_asc": Case.case_id.asc(),
+    }
+    return query.distinct().order_by(sort_map.get(sort, Case.updated_at.desc()))
+
+
 @main_bp.route("/")
 def dashboard():
     metrics = dashboard_metrics()
@@ -25,6 +69,8 @@ def dashboard():
     recent_notes = InvestigationNote.query.order_by(InvestigationNote.created_at.desc()).limit(6).all()
     alerts = repeat_entities(limit=6)
     insights = investigation_insights()
+    needs_evidence = [case for case in Case.query.order_by(Case.updated_at.desc()).all() if not case.entities][:5]
+    needs_notes = [case for case in Case.query.order_by(Case.updated_at.desc()).all() if not case.notes][:5]
     return render_template(
         "dashboard.html",
         metrics=metrics,
@@ -32,6 +78,8 @@ def dashboard():
         recent_notes=recent_notes,
         alerts=alerts,
         insights=insights,
+        needs_evidence=needs_evidence,
+        needs_notes=needs_notes,
     )
 
 
@@ -43,16 +91,62 @@ def workflow():
 @main_bp.route("/cases")
 def case_list():
     status = request.args.get("status", "")
-    query = Case.query
-    if status:
-        query = query.filter_by(status=status)
-    cases = query.order_by(Case.updated_at.desc()).all()
+    term = request.args.get("q", "").strip()
+    entity_type = request.args.get("entity_type", "").strip()
+    sort = request.args.get("sort", "updated_desc").strip()
+    cases = _case_query_from_args(request.args).all()
     return render_template(
         "cases/list.html",
         cases=cases,
         status=status,
+        term=term,
+        entity_type=entity_type,
+        sort=sort,
         status_options=CASE_STATUSES,
+        entity_types=entity_type_options(),
         delete_form=DeleteForm(),
+    )
+
+
+@main_bp.route("/cases/export")
+def case_export():
+    cases = _case_query_from_args(request.args).all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(
+        [
+            "Case ID",
+            "FIR Number",
+            "Complaint Date",
+            "Investigation Type",
+            "Officer",
+            "Status",
+            "Victim",
+            "Victim Contact",
+            "Evidence Count",
+            "Note Count",
+        ]
+    )
+    for case in cases:
+        writer.writerow(
+            [
+                case.case_id,
+                case.fir_number,
+                case.complaint_date.isoformat(),
+                case.fraud_type,
+                case.investigating_officer,
+                case.status,
+                case.victim_name,
+                case.victim_contact,
+                len(case.entities),
+                len(case.notes),
+            ]
+        )
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=caselink-cases.csv"},
     )
 
 
@@ -180,6 +274,20 @@ def case_add_note(case_id):
         flash("Investigation note added.", "success")
     else:
         flash("Note requires officer and body.", "danger")
+    return redirect(url_for("main.case_detail", case_id=case.id))
+
+
+@main_bp.route("/cases/<int:case_id>/notes/<int:note_id>/delete", methods=["POST"])
+def case_delete_note(case_id, note_id):
+    case = Case.query.get_or_404(case_id)
+    note = InvestigationNote.query.filter_by(id=note_id, case_id=case.id).first_or_404()
+    form = DeleteForm()
+    if form.validate_on_submit():
+        db.session.delete(note)
+        db.session.commit()
+        flash("Investigation note deleted.", "success")
+    else:
+        flash("Unable to delete note. Please try again.", "danger")
     return redirect(url_for("main.case_detail", case_id=case.id))
 
 

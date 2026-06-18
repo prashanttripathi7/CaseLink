@@ -17,6 +17,25 @@
   </div>
 </section>
 
+<section class="case-summary-grid">
+  <div class="summary-tile">
+    <span>Evidence</span>
+    <strong>{{ case.entities|length }}</strong>
+  </div>
+  <div class="summary-tile">
+    <span>Notes</span>
+    <strong>{{ case.notes|length }}</strong>
+  </div>
+  <div class="summary-tile">
+    <span>Links</span>
+    <strong>{{ relationships.alerts|length + relationships.indirect|length }}</strong>
+  </div>
+  <div class="summary-tile">
+    <span>Updated</span>
+    <strong>{{ case.updated_at.strftime("%d %b") }}</strong>
+  </div>
+</section>
+
 <section class="two-column">
   <div class="panel">
     <div class="panel-head"><h2><i data-lucide="info"></i> Investigation Metadata</h2></div>
@@ -49,11 +68,15 @@
       <div class="entity-card">
         <span class="entity-type">{{ entity.type_label }}</span>
         <strong>{{ entity.value }}</strong>
+        {% if entity.label %}<span>{{ entity.label }}</span>{% endif %}
+        {% if entity.metadata_text %}<em>{{ entity.metadata_text }}</em>{% endif %}
         <small><i data-lucide="link-2"></i> {{ entity.cases|length }} linked investigation{{ "s" if entity.cases|length != 1 }}</small>
         {% if entity.cases|length > 1 %}
-          <em>Related: {% for related in entity.cases if related.id != case.id %}{{ related.case_id }} {% endfor %}</em>
+          <em>Related: {% for related in entity.cases if related.id != case.id %}<a href="{{ url_for('main.case_detail', case_id=related.id) }}">{{ related.case_id }}</a> {% endfor %}</em>
         {% endif %}
         <div class="entity-actions">
+          <button class="btn btn-outline-light btn-icon btn-xs" type="button" data-copy="{{ entity.value }}" aria-label="Copy {{ entity.value }}" title="Copy"><i data-lucide="copy"></i></button>
+          <a href="{{ url_for('main.search', q=entity.value) }}" class="btn btn-outline-light btn-icon btn-xs" aria-label="Search {{ entity.value }}" title="Search"><i data-lucide="search"></i></a>
           <a href="{{ url_for('main.entity_edit', entity_id=entity.id) }}" class="btn btn-outline-light btn-icon btn-xs" aria-label="Edit {{ entity.value }}" title="Edit"><i data-lucide="pencil"></i></a>
           <form method="post" action="{{ url_for('main.case_remove_entity', case_id=case.id, entity_id=entity.id) }}" data-confirm="Remove {{ entity.value }} from {{ case.case_id }}?">
             {{ entity_form.csrf_token }}
@@ -94,7 +117,13 @@
       <div class="activity-list">
         {% for note in case.notes|sort(attribute="created_at", reverse=True) %}
           <div class="activity">
-            <strong><i data-lucide="user"></i> {{ note.author }}</strong>
+            <div class="activity-head">
+              <strong><i data-lucide="user"></i> {{ note.author }}</strong>
+              <form method="post" action="{{ url_for('main.case_delete_note', case_id=case.id, note_id=note.id) }}" data-confirm="Delete this investigation note?">
+                {{ delete_form.hidden_tag() }}
+                <button class="btn btn-outline-light btn-icon btn-xs" type="submit" aria-label="Delete note" title="Delete note"><i data-lucide="trash-2"></i></button>
+              </form>
+            </div>
             <span>{{ note.body }}</span>
             <time><i data-lucide="clock"></i> {{ note.created_at.strftime("%d %b %H:%M") }}</time>
           </div>

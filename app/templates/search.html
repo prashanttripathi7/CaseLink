@@ -17,7 +17,14 @@
   <div class="panel">
     <div class="panel-head"><h2><i data-lucide="database"></i> Connected Evidence</h2><span class="badge">{{ results.entities|length }}</span></div>
     {% for entity in results.entities %}
-      <div class="result-row"><strong>{{ entity.value }}</strong><span>{{ entity.type_label }}</span><em>{{ entity.cases|length }} investigations</em></div>
+      <div class="result-row">
+        <div class="result-head">
+          <strong>{{ entity.value }}</strong>
+          <button class="btn btn-outline-light btn-icon btn-xs" type="button" data-copy="{{ entity.value }}" aria-label="Copy {{ entity.value }}" title="Copy"><i data-lucide="copy"></i></button>
+        </div>
+        <span>{{ entity.type_label }}</span>
+        <em>{% for case in entity.cases %}<a href="{{ url_for('main.case_detail', case_id=case.id) }}">{{ case.case_id }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</em>
+      </div>
     {% else %}<p class="empty"><i data-lucide="inbox"></i> No matching evidence entities were found.</p>{% endfor %}
   </div>
 </section>
